@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/envsound/__init__.py
+src/envsound/config.py
+src/envsound/data.py
+src/envsound/model.py
+src/envsound/train.py
+src/envsound.egg-info/PKG-INFO
+src/envsound.egg-info/SOURCES.txt
+src/envsound.egg-info/dependency_links.txt
+src/envsound.egg-info/requires.txt
+src/envsound.egg-info/top_level.txt

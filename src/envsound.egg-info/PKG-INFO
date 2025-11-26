@@ -1,0 +1,94 @@
+Metadata-Version: 2.4
+Name: envsound
+Version: 0.1.0
+Summary: Environment sound classification system built on Soundata + UrbanSound8K
+Author: AI Assistant
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: soundata>=1.0.1
+Requires-Dist: librosa>=0.10
+Requires-Dist: torch>=2.0
+Requires-Dist: torchaudio>=2.0
+Requires-Dist: matplotlib>=3.8
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: numpy>=1.24
+Requires-Dist: tqdm>=4.66
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+
+# 基于卷积神经网络的环境声音智能分类系统
+
+课程项目：人工智能算法应用系统创新设计 —— 使用 Soundata + UrbanSound8K
+
+## 项目简介
+本项目实现了一个端到端的环境声音分类系统，覆盖数据下载、Mel 频谱特征工程、卷积神经网络训练与推理 Demo，以及展示所需的 PPT 内容与讲稿提纲。核心流程完全遵循 Soundata 官方推荐的使用方式，确保数据管理标准化、可复现。
+
+## 项目目标
+1. 使用 `soundata` 自动下载、验证 UrbanSound8K 数据集。  
+2. 将音频转换为 128×128 Mel 频谱图，便于 CNN 处理。  
+3. 训练一个轻量 CNN 模型完成 10 类环境声音识别。  
+4. 提供命令行推理 Demo，输入任意音频即可获得预测。  
+5. 输出训练日志、混淆矩阵，可直接用于 PPT 展示与改进分析。
+
+## 仓库结构
+```
+├── pyproject.toml                # 依赖声明
+├── README.md
+├── docs/
+│   └── presentation_outline.md   # PPT 内容框架 + 演讲稿要点
+└── src/envsound/
+    ├── __init__.py
+    ├── config.py                 # 训练/特征参数
+    ├── data.py                   # Soundata 数据管线与 Mel 频谱数据集
+    ├── model.py                  # CNN 模型定义
+    ├── train.py                  # 训练脚本（含混淆矩阵可视化）
+    └── demo.py                   # 推理 Demo
+```
+
+## 环境配置
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+> 若需要指定国内镜像，可在 `pip install` 时带上 `-i https://pypi.tuna.tsinghua.edu.cn/simple`。
+
+## 使用指南
+### 1. 下载 & 验证数据
+```bash
+python -m envsound.train --data-home data/raw --download
+```
+首轮运行会触发 `soundata` 下载 UrbanSound8K，数据会自动保存到 `data/raw/urbansound8k` (或 `UrbanSound8K`)。
+
+### 2. 训练模型
+```bash
+python -m envsound.train \
+    --data-home data/raw \
+    --processed-dir data/processed \
+    --epochs 30 \
+    --batch-size 32 \
+    --limit-per-class 500        # 可选：减少训练时间
+```
+输出内容：
+- `artifacts/best_model.pt`：保存的模型参数  
+- `artifacts/training_log.json`：每回合 loss/accuracy  
+- `artifacts/confusion_matrix.png`：验证集混淆矩阵
+
+### 3. 推理 Demo
+```bash
+python -m envsound.demo \
+    --checkpoint artifacts/best_model.pt \
+    --audio path/to/audio.wav
+```
+命令会打印前 3 个类别概率，可直接用于现场演示。
+
+## PPT & 演讲稿
+`docs/presentation_outline.md` 给出了推荐的 PPT 章节、重点图示（Mel 频谱、网络结构、混淆矩阵），以及演讲要点和创新点说明，可直接按章节制作。
+
+## 数据与引用
+- UrbanSound8K: Salamon, J., Jacoby, C., & Bello, J. P. (2014).  
+- Soundata: Fuentes et al., 2024, *JOSS*。
+
+如在论文/报告中使用，请在 PPT 中附上上述引用，并可调用 `soundata.initialize('urbansound8k').cite()` 获得完整格式。

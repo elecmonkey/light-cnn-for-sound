@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "envsound"
+version = "0.1.0"
+description = "Environment sound classification system built on Soundata + UrbanSound8K"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "AI Assistant" }
+]
+dependencies = [
+  "soundata>=1.0.1",
+  "librosa>=0.10",
+  "torch>=2.0",
+  "torchaudio>=2.0",
+  "matplotlib>=3.8",
+  "scikit-learn>=1.3",
+  "numpy>=1.24",
+  "tqdm>=4.66"
+]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "isort",
+  "pytest"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
