@@ -1,0 +1,37 @@
+```mermaid
+flowchart LR
+    in[输入 Mel 频谱<br/>1×128×128]
+
+    subgraph C1[卷积块 1]
+        c1conv[Conv2d 1→16<br/>kernel 3×3, stride 1, pad 1]
+        c1bn[BatchNorm + ReLU]
+        c1pool[MaxPool 2×2 → 16×64×64]
+        c1conv --> c1bn --> c1pool
+    end
+
+    subgraph C2[卷积块 2]
+        c2conv[Conv2d 16→32<br/>kernel 3×3, stride 1, pad 1]
+        c2bn[BatchNorm + ReLU]
+        c2pool[MaxPool 2×2 → 32×32×32]
+        c2conv --> c2bn --> c2pool
+    end
+
+    subgraph C3[卷积块 3]
+        c3conv[Conv2d 32→64<br/>kernel 3×3, stride 1, pad 1]
+        c3bn[BatchNorm + ReLU]
+        c3pool[MaxPool 2×2 → 64×16×16]
+        c3drop[Dropout 0.3]
+        c3gap[AdaptiveAvgPool → 64×1×1]
+        c3conv --> c3bn --> c3pool --> c3drop --> c3gap
+    end
+
+    subgraph FC[全连接层]
+        fc1[Flatten → 64]
+        fc2[Linear 64→128 + ReLU + Dropout]
+        fc3[Linear 128→10]
+        softmax[Softmax → 类别概率]
+        fc1 --> fc2 --> fc3 --> softmax
+    end
+
+    in --> C1 --> C2 --> C3 --> FC
+```
