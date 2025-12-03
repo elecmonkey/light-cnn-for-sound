@@ -32,7 +32,15 @@ def parse_args() -> argparse.Namespace:
 def load_checkpoint(path: Path, device: torch.device) -> Dict:
     if not path.exists():
         raise FileNotFoundError(f"Checkpoint not found at {path}")
-    return torch.load(path, map_location=device)
+    # 处理跨平台 Path 兼容性问题（PosixPath 在 Windows 上无法实例化）
+    import pathlib
+    import sys
+    if sys.platform == 'win32':
+        # 在 Windows 上将 PosixPath 映射为 WindowsPath
+        pathlib.PosixPath = pathlib.WindowsPath
+    # weights_only=False 因为 checkpoint 包含配置信息
+    # 仅在信任 checkpoint 来源时使用
+    return torch.load(path, map_location=device, weights_only=False)
 
 
 def config_from_checkpoint(data: Dict) -> TrainConfig:
@@ -52,7 +60,7 @@ def prepare_input_tensor(audio_path: Path, config: TrainConfig) -> np.ndarray:
     y, sr = librosa.load(audio_path, sr=config.sample_rate, mono=True)
     target_length = int(config.clip_duration * sr)
     if target_length > 0:
-        y = librosa.util.fix_length(y, target_length)
+        y = librosa.util.fix_length(y, size=target_length)
     mel = waveform_to_mel(y, sr, config)
     return mel
 

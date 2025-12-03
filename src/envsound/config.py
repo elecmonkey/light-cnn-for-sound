@@ -37,4 +37,9 @@ class TrainConfig:
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     def asdict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        # 将 Path 对象转换为字符串，确保跨平台兼容性
+        for key, value in d.items():
+            if isinstance(value, Path):
+                d[key] = str(value)
+        return d
